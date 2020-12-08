@@ -137,13 +137,10 @@ void read_image(char *name)
         return;
     fscanf(f, "%s\n", aux);
     P = aux[1] - 48;
-    // printf("%d\n", P);
     aux = realloc(aux, 500);
     fgets(aux, 500, f);
     fscanf(f, "%d %d\n", &width, &height);
-    printf("%d %d\n", width, height);
     fscanf(f, "%d\n", &maxval);
-    // printf("%d\n", maxval);
     free(aux);
     if (P == 5)
     {
@@ -153,7 +150,6 @@ void read_image(char *name)
     {
         size = width * height * 3;
     }
-    // printf("%d\n", size);
     img = malloc(size);
     if (!img)
     {

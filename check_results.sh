@@ -21,19 +21,19 @@ done
 echo '===COMPARING RESULTS==='
 for i in 1 2 4
 do
-	echo 'Comparing darth_seq with dart parallel with $i threads'
+	echo Comparing darth_seq with dart parallel with $i threads
 	./compare darth_seq darth_p$i
-	echo 'Comparing darth_seq with dart OMP1 with $i threads'
+	echo Comparing darth_seq with dart OMP1 with $i threads
 	./compare darth_seq darth_o$i
-	echo 'Comparing darth_seq with dart OMP2 with $i threads'
+	echo Comparing darth_seq with dart OMP2 with $i threads
 	./compare darth_seq darth_o2$i
 
 
-	echo 'Comparing macro_seq with macro parallel with $i threads'
+	echo Comparing macro_seq with macro parallel with $i threads
 	./compare macro_seq macro_p$i
-	echo 'Comparing macro_seq with macro OMP1 with $i threads'
+	echo Comparing macro_seq with macro OMP1 with $i threads
 	./compare macro_seq macro_o$i
-	echo 'Comparing macro_seq with macro OMP2 with $i threads'
+	echo Comparing macro_seq with macro OMP2 with $i threads
 	./compare macro_seq macro_o2$i
 done
 
