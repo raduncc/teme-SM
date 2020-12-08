@@ -193,7 +193,6 @@ int main(int argc, char const *argv[])
     {
         int ID = omp_get_thread_num();
         edit_image(ID);
-    // edit_image();
     }
     write_image(name_out);
     return 0;
