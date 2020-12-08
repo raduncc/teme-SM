@@ -182,7 +182,7 @@ int main(int argc, char const *argv[])
 {
     if (argc != 4)
     {
-        printf("Not enough arguments! Usage: ./sequential file_in_name file_out_name no_of_threads");
+        printf("Not enough arguments! Usage: ./sequential file_in_name file_out_name no_of_threads\n");
         return -1;
     }
     int i;

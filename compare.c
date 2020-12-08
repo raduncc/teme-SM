@@ -56,7 +56,7 @@ void compare_images(char *name_src, char *name_tgt)
         fscanf(tgt, "%c", &val_tgt);
         if (val_src != val_tgt) {
             printf("Pixels differ! IMAGES ARE DIFFERENT at %d!\n", i);
-            // return;
+            return;
         }
     }
     printf("IMAGES ARE EQUAL! Congrats!\n");
@@ -64,6 +64,10 @@ void compare_images(char *name_src, char *name_tgt)
 
 int main(int argc, char const *argv[])
 {
+    if (argc != 3) {
+        printf("Not enough arguments! Usage: ./compare file1 file2\n");
+        return -1;
+    }
     char *name1 = strdup(argv[1]);
     char *name2 = strdup(argv[2]);
     compare_images(name1, name2);

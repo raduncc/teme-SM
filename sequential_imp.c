@@ -132,7 +132,7 @@ void write_image(char *name)
 int main(int argc, char const *argv[])
 {
     if (argc != 3) {
-        printf("Not enough arguments! Usage: ./sequential file_in_name file_out_name");
+        printf("Not enough arguments! Usage: ./sequential file_in_name file_out_name\n");
         return -1;
     }
     char *name_in = strdup(argv[1]);
