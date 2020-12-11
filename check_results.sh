@@ -18,6 +18,12 @@ do
 	./openmp2 tests/macro.pnm macro_o2$i $i
 done
 
+for i in 1 2 4 8
+do
+	mpirun -np $i ./mpi tests/darth-vader.pgm darth_mpi$i
+	mpirun -np $i ./mpi tests/macro.pnm macro_mpi$i
+done
+
 echo '===COMPARING RESULTS==='
 for i in 1 2 4
 do
@@ -35,6 +41,14 @@ do
 	./compare macro_seq macro_o$i
 	echo Comparing macro_seq with macro OMP2 with $i threads
 	./compare macro_seq macro_o2$i
+done
+
+for i in 1 2 4 8
+do
+	echo Comparing darth_seq with dart MPI with $i processes
+	./compare darth_seq darth_mpi$i
+	echo Comparing macro_seq with macro MPI with $i processes
+	./compare macro_seq macro_mpi$i
 done
 
 echo '===CLEANING==='

@@ -4,8 +4,11 @@
 
 void compare_images(char *name_src, char *name_tgt)
 {
+    int flag = 0;
     FILE *src = fopen(name_src, "r");
     FILE *tgt = fopen(name_tgt, "r");
+    FILE *diff = fopen("difference", "w");
+
     int P_src, P_tgt;
     int maxval_src, maxval_tgt;
     int width_src, height_src, width_tgt, height_tgt;
@@ -21,24 +24,27 @@ void compare_images(char *name_src, char *name_tgt)
 
     if (P_src != P_tgt)
     {
-        printf("P's differ! IMAGES ARE DIFFERENT!\n");
-        return;
+        // printf("P's differ! IMAGES ARE DIFFERENT!\n");
+        // return;
+        flag = 1;
     }
 
     fscanf(src, "%d %d\n", &width_src, &height_src);
     fscanf(tgt, "%d %d\n", &width_tgt, &height_tgt);
     if (width_src != width_tgt || height_src != height_tgt)
     {
-        printf("Heights or widths differ! IMAGES ARE DIFFERENT!\n");
-        return;
+        // printf("Heights or widths differ! IMAGES ARE DIFFERENT!\n");
+        // return;
+        flag = 1;
     }
 
     fscanf(src, "%d\n", &maxval_src);
     fscanf(tgt, "%d\n", &maxval_tgt);
     if (maxval_src != maxval_tgt)
     {
-        printf("Maxvals differ! IMAGES ARE DIFFERENT!\n");
-        return;
+        // printf("Maxvals differ! IMAGES ARE DIFFERENT!\n");
+        // return;
+        flag = 1;
     }
     free(aux);
     int size;
@@ -51,20 +57,60 @@ void compare_images(char *name_src, char *name_tgt)
         size = width_src * height_src * 3;
     }
     char val_src, val_tgt;
-    for (int i = 0; i < size; ++i) {
+    fprintf(diff, "P%d\n", P_src);
+    fprintf(diff, "%d %d\n", width_src, height_src);
+    fprintf(diff, "%d\n", maxval_src);
+    //more exact comparison to check differences
+    
+    // for (int i = 0; i < height_src; ++i)
+    // {
+    //     for (int j = 0; j < width_src * 3; ++j)
+    //     {
+    //         fscanf(src, "%c", &val_src);
+    //         fscanf(tgt, "%c", &val_tgt);
+    //         if (val_src != val_tgt)
+    //         {
+    //             printf("Pixels differ! IMAGES ARE DIFFERENT at %d %d! %d %d\n", i, j, val_src, val_tgt);
+    //             // return;
+    //             fprintf(diff, "%c", 100);
+    //             flag = 1;
+    //         }
+    //         else
+    //         {
+    //             fprintf(diff, "%c", val_src);
+    //         }
+    //     }
+    // }
+    for (int i = 0; i < size; ++i)
+    {
         fscanf(src, "%c", &val_src);
         fscanf(tgt, "%c", &val_tgt);
-        if (val_src != val_tgt) {
-            printf("Pixels differ! IMAGES ARE DIFFERENT at %d!\n", i);
-            return;
+        if (val_src != val_tgt)
+        {
+            printf("Pixels differ! IMAGES ARE DIFFERENT at %d %d!\n", i/(width_src*3), size-width_src*3);
+            // return;
+            fprintf(diff, "%c", 100);
+            flag = 1;
+        }
+        else
+        {
+            fprintf(diff, "%c", val_src);
         }
     }
-    printf("IMAGES ARE EQUAL! Congrats!\n");
+    if (flag == 0)
+    {
+        printf("IMAGES ARE EQUAL! Congrats!\n");
+    }
+    else
+    {
+        printf("Images differ!\n");
+    }
 }
 
 int main(int argc, char const *argv[])
 {
-    if (argc != 3) {
+    if (argc != 3)
+    {
         printf("Not enough arguments! Usage: ./compare file1 file2\n");
         return -1;
     }

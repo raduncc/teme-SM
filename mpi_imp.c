@@ -88,12 +88,18 @@ void edit_image()
 void write_to_final(unsigned char *image, int wdth, int hgt, int id)
 {
     int i, j;
-
     for (i = 0; i < hgt; ++i)
     {
         for (j = 0; j < wdth; ++j)
         {
-            img_new[i * width + id * wdth + j] = image[i * wdth + j];
+            if (P == 5)
+            {
+                img_new[i * width + id * wdth + j] = image[i * wdth + j];
+            }
+            else if (P == 6)
+            {
+                img_new[i * 3 * width + id * wdth + j] = image[i * wdth + j];
+            }
         }
     }
 }
@@ -103,7 +109,6 @@ void edit_remaining()
     int i, j;
     if (P == 5)
     {
-
         for (i = 1; i < height; ++i)
         {
             for (j = 1; j < width / N; ++j)
@@ -120,27 +125,11 @@ void edit_remaining()
                 img_new[i * width + j] = min_val;
             }
         }
-        printf("\nXXXXXXXXXXXX%d %dXXXXXXXXXX\n", width, width / N);
         for (i = 1; i < height - 1; ++i)
         {
             for (j = width / N; j < width; j += width / N)
             {
                 unsigned char min_val;
-                if (j == width / N)
-                {
-                    min_val = 255;
-                    for (int a = -1; a <= 1; ++a)
-                    {
-                        for (int b = -1; b <= 1; ++b)
-                        {
-                            if (img[(i + a) * width + j + b] < min_val)
-                                min_val = img[(i + a) * width + j + b];
-                        }
-                    }
-                    img_new[i * width + j] = min_val;
-                    continue;
-                }
-
                 j--;
                 min_val = 255;
                 for (int a = -1; a <= 1; ++a)
@@ -187,7 +176,7 @@ void edit_remaining()
                 unsigned char min_val = 255;
                 for (int a = -1; a <= 1; ++a)
                 {
-                    for (int b = -3; b <= 3; b+=3)
+                    for (int b = -3; b <= 3; b += 3)
                     {
                         if (img[(i + a) * 3 * width + j + b] < min_val)
                             min_val = img[(i + a) * 3 * width + j + b];
@@ -198,7 +187,7 @@ void edit_remaining()
                 min_val = 255;
                 for (int a = -1; a <= 1; ++a)
                 {
-                    for (int b = -3; b <= 3; b+=3)
+                    for (int b = -3; b <= 3; b += 3)
                     {
                         if (img[(i + a) * 3 * width + j + b] < min_val)
                             min_val = img[(i + a) * 3 * width + j + b];
@@ -209,7 +198,7 @@ void edit_remaining()
                 min_val = 255;
                 for (int a = -1; a <= 1; ++a)
                 {
-                    for (int b = -3; b <= 3; b+=3)
+                    for (int b = -3; b <= 3; b += 3)
                     {
                         if (img[(i + a) * 3 * width + j + b] < min_val)
                             min_val = img[(i + a) * 3 * width + j + b];
@@ -218,156 +207,48 @@ void edit_remaining()
                 img_new[i * 3 * width + j] = min_val;
             }
         }
-        // printf("\nXXXXXXXXXXXX%d %dXXXXXXXXXX\n", width, width / N);
         for (i = 1; i < height - 1; ++i)
         {
-            for (j = 3 * width / N; j < 3 * width; j +=  width / N) // was 3*w/n
+            for (j = 3 * width / N; j <= 3 * width; j += 3 * width / N)
             {
                 unsigned char min_val;
                 if (j == 3 * width / N)
                 {
-                    min_val = 255;
-                    for (int a = -1; a <= 1; ++a)
+                    for (int t = 0; t < 6; t++)
                     {
-                        for (int b = -3; b <= 3; ++b)
+                        min_val = 255;
+                        for (int a = -1; a <= 1; ++a)
                         {
-                            if (img[(i + a) * 3 * width + j + b] < min_val)
-                                min_val = img[(i + a) * 3 * width + j + b];
+                            for (int b = -3; b <= 3; b += 3)
+                            {
+                                if (img[(i + a) * 3 * width + j + t + b] < min_val)
+                                    min_val = img[(i + a) * 3 * width + j + t + b];
+                            }
                         }
+                        img_new[i * 3 * width + j + t] = min_val;
                     }
-                    img_new[i * 3 * width + j] = min_val;
-                    j++;
-                    min_val = 255;
-                    for (int a = -1; a <= 1; ++a)
-                    {
-                        for (int b = -3; b <= 3; ++b)
-                        {
-                            if (img[(i + a) * 3 * width + j + b] < min_val)
-                                min_val = img[(i + a) * 3 * width + j + b];
-                        }
-                    }
-                    img_new[i * 3 * width + j] = min_val;
-                    j++;
-                    min_val = 255;
-                    for (int a = -1; a <= 1; ++a)
-                    {
-                        for (int b = -3; b <= 3; ++b)
-                        {
-                            if (img[(i + a) * 3 * width + j + b] < min_val)
-                                min_val = img[(i + a) * 3 * width + j + b];
-                        }
-                    }
-                    img_new[i * 3 * width + j] = min_val;
-                    j -= 2;
                     continue;
                 }
-
-                j -= 3;
-                min_val = 255;
-                for (int a = -1; a <= 1; ++a)
+                for (int t = -3; t < 3; t++)
                 {
-                    for (int b = -3; b <= 3; ++b)
+                    min_val = 255;
+                    for (int a = -1; a <= 1; ++a)
                     {
-                        if (img[(i + a) * 3 * width + j + b] < min_val)
-                            min_val = img[(i + a) * 3 * width + j + b];
+                        for (int b = -3; b <= 3; b += 3)
+                        {
+                            if (img[(i + a) * 3 * width + j + t + b] < min_val)
+                                min_val = img[(i + a) * 3 * width + j + t + b];
+                        }
                     }
+                    img_new[i * 3 * width + j + t] = min_val;
                 }
-                img_new[i * 3 * width + j] = min_val;
-                j++;
-                min_val = 255;
-                for (int a = -1; a <= 1; ++a)
-                {
-                    for (int b = -3; b <= 3; ++b)
-                    {
-                        if (img[(i + a) * 3 * width + j + b] < min_val)
-                            min_val = img[(i + a) * 3 * width + j + b];
-                    }
-                }
-                img_new[i * 3 * width + j] = min_val;
-                j++;
-                min_val = 255;
-                for (int a = -1; a <= 1; ++a)
-                {
-                    for (int b = -3; b <= 3; ++b)
-                    {
-                        if (img[(i + a) * 3 * width + j + b] < min_val)
-                            min_val = img[(i + a) * 3 * width + j + b];
-                    }
-                }
-                img_new[i * 3 * width + j] = min_val;
-                j++;
-                // j += 3;
-                min_val = 255;
-                for (int a = -1; a <= 1; ++a)
-                {
-                    for (int b = -3; b <= 3; ++b)
-                    {
-                        if (img[(i + a) * 3 * width + j + b] < min_val)
-                            min_val = img[(i + a) * 3 * width + j + b];
-                    }
-                }
-                img_new[i * 3 * width + j] = min_val;
-                j++;
-                // j += 3;
-                min_val = 255;
-                for (int a = -1; a <= 1; ++a)
-                {
-                    for (int b = -3; b <= 3; ++b)
-                    {
-                        if (img[(i + a) * 3 * width + j + b] < min_val)
-                            min_val = img[(i + a) * 3 * width + j + b];
-                    }
-                }
-                img_new[i * 3 * width + j] = min_val;
-                j++;
-                // j += 3;
-                min_val = 255;
-                for (int a = -1; a <= 1; ++a)
-                {
-                    for (int b = -3; b <= 3; ++b)
-                    {
-                        if (img[(i + a) * 3 * width + j + b] < min_val)
-                            min_val = img[(i + a) * 3 * width + j + b];
-                    }
-                }
-                img_new[i * 3 * width + j] = min_val;
-                j++;
-                // j += 3;
-                min_val = 255;
-                for (int a = -1; a <= 1; ++a)
-                {
-                    for (int b = -3; b <= 3; ++b)
-                    {
-                        if (img[(i + a) * 3 * width + j + b] < min_val)
-                            min_val = img[(i + a) * 3 * width + j + b];
-                    }
-                }
-                img_new[i * 3 * width + j] = min_val;
-                j++;
-                // j += 3;
-                min_val = 255;
-                for (int a = -1; a <= 1; ++a)
-                {
-                    for (int b = -3; b <= 3; ++b)
-                    {
-                        if (img[(i + a) * 3 * width + j + b] < min_val)
-                            min_val = img[(i + a) * 3 * width + j + b];
-                    }
-                }
-                img_new[i * 3 * width + j] = min_val;
-                j++;
-                // j += 3;
-                min_val = 255;
-                for (int a = -1; a <= 1; ++a)
-                {
-                    for (int b = -3; b <= 3; ++b)
-                    {
-                        if (img[(i + a) * 3 * width + j + b] < min_val)
-                            min_val = img[(i + a) * 3 * width + j + b];
-                    }
-                }
-                img_new[i * 3 * width + j] = min_val;
-                j -= 5;
+            }
+        }
+        for (i = 0; i < height; ++i)
+        {
+            for (j = 0; j < 3; ++j)
+            {
+                img_new[i * 3 * width + j] = 0;
             }
         }
     }
@@ -412,7 +293,7 @@ void filter_function(int hgt, int wdth)
                     }
                 }
                 img_result[i * wdth + j] = min_val;
-                //green channel
+                // green channel
                 j++;
                 min_val = 255;
                 for (int a = -1; a <= 1; ++a)
@@ -496,8 +377,6 @@ int main(int argc, char *argv[])
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &N);
-    printf("\nI am rank %d\n", rank);
-
     if (argc != 3)
     {
         printf("Not enough arguments! Usage: mpirun -np no_of_processes ./mpi file_in_name  file_out_name\n");
@@ -518,7 +397,6 @@ int main(int argc, char *argv[])
         name_out = strdup(argv[2]);
         read_image(name_in);
         vec_size = width / N;
-        // printf("%d %d", size, vec_size);
         img_new_aux = malloc(vec_size);
         if (!img_new_aux)
         {
@@ -527,14 +405,11 @@ int main(int argc, char *argv[])
         }
         for (i = 1; i < N; ++i)
         {
-            // printf("\nI am rank %d and sending %d to %d\n", rank, vec_size, i);
             MPI_Send(&vec_size, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
             MPI_Send(&P, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
-            // MPI_Send(&width, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
             MPI_Send(&height, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
         }
         unsigned char *vec;
-        printf("%d %d", vec_size, width);
         if (P == 5)
         {
             vec = malloc(height * vec_size);
@@ -545,7 +420,6 @@ int main(int argc, char *argv[])
         }
         for (j = 0; j < N; ++j)
         {
-            printf("\n===%d===\n", j * vec_size);
             for (i = 0; i < height; ++i)
             {
                 if (P == 5)
@@ -554,7 +428,7 @@ int main(int argc, char *argv[])
                 }
                 else if (P == 6)
                 {
-                    memcpy(vec + i * 3 * vec_size, img + i * width + j * 3 * vec_size, vec_size * 3);
+                    memcpy(vec + i * 3 * vec_size, img + i * 3 * width + j * 3 * vec_size, vec_size * 3);
                 }
             }
             if (j != 0)
@@ -568,16 +442,6 @@ int main(int argc, char *argv[])
                     MPI_Send(vec, height * vec_size * 3, MPI_UNSIGNED_CHAR, j, 0, MPI_COMM_WORLD);
                 }
             }
-
-            // printf("\nXXX%dXXX\n", vec_size);
-        }
-        if (P == 5)
-        {
-            printf("===%d===%d", height * vec_size, height * width);
-        }
-        else if (P == 6)
-        {
-            printf("===%d===%d", height * vec_size * 3, height * width * 3);
         }
     }
     else
@@ -585,9 +449,7 @@ int main(int argc, char *argv[])
         int my_size;
         MPI_Recv(&my_size, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &Stat);
         MPI_Recv(&P, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &Stat);
-        // MPI_Recv(&width, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &Stat);
         MPI_Recv(&height, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &Stat);
-        printf("\nreceived %d %d %d\n", P, height, my_size);
         if (P == 5)
         {
             img_new_aux = malloc(my_size * height);
@@ -598,7 +460,7 @@ int main(int argc, char *argv[])
             img_new_aux = malloc(my_size * height * 3);
             img_result = malloc(my_size * height * 3);
         }
-        if (!img_new_aux)
+        if (!img_new_aux || !img_result)
         {
             printf("Error trying to allocate img_new_aux by rank %d\n", rank);
             return -1;
@@ -625,6 +487,7 @@ int main(int argc, char *argv[])
 
     if (rank == 0)
     {
+
         img_new = malloc(size);
         if (!img_new)
         {
@@ -654,7 +517,7 @@ int main(int argc, char *argv[])
             }
         }
         edit_remaining();
-        // write_image(name_out);
+        write_image(name_out);
     }
     MPI_Finalize();
     return 0;
