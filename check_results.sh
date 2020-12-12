@@ -22,6 +22,11 @@ for i in 1 2 4 8
 do
 	mpirun -np $i ./mpi tests/darth-vader.pgm darth_mpi$i
 	mpirun -np $i ./mpi tests/macro.pnm macro_mpi$i
+	for j in 1 2 4
+	do
+	mpirun -np $i ./hybrid tests/darth-vader.pgm darth_hybrid$i$j $j
+	mpirun -np $i ./hybrid tests/macro.pnm macro_hybrid$i$j $j
+	done
 done
 
 echo '===COMPARING RESULTS==='
@@ -49,6 +54,13 @@ do
 	./compare darth_seq darth_mpi$i
 	echo Comparing macro_seq with macro MPI with $i processes
 	./compare macro_seq macro_mpi$i
+	for j in 1 2 4
+	do
+		echo Comparing darth_seq with darth HYBRID with $i processes and $j threads
+		./compare darth_seq darth_hybrid$i$j
+		echo Comparing macro_seq with macro HYBRID with $i processes and $j threads
+		./compare macro_seq macro_hybrid$i$j
+	done
 done
 
 echo '===CLEANING==='
