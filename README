@@ -1,0 +1,140 @@
+TEMELE 1 SI 2 SM
+NICOLESCU RADU-CATALIN, 343C4
+
+1. DETALII DE IMPLEMENTARE
+
+Am implementat filtrul de dilatare, care accentueaza pixelii inchisi din poze. Acesta 
+are o fereastra de 3x3 pixeli in jurul pixelului central si calculeaza minimul acestora, 
+memorand valoarea in pixelul central.
+
+Pentru a pastra dimensiunea arhivei sub 1.5M, am inclus doar o imagine de test.
+Din acest motiv, am comentat o parte din comenzile din scriptul de check_results.
+
+Rezultatele de timp afisate pentru rularea checker-ului avand ca input poza din folderul tests 
+nu sunt foarte relevante, pentru ca dimensiunea acesteia este foarte mica, si nu putem trage 
+concluzii relevante cu privire la performanta programelor.
+
+In sectiunea 2, de analiza a rezultatelor, timpii sunt obtinuti pentru poze mult mai mari decat 
+cea prezenta in folderul tests.
+
+a)check_results
+
+Script-ul check_results ia cele 2 imagini (alb-negru si color) din teste, ruleaza sursele
+avand ca input cele 2 imagini si dau ca output imaginea rezultat in urma dilatarii. Toate imaginile
+rezultat sunt apoi comparate cu imaginea rezultata in urma implementarii secventiale. Daca acestea sunt
+egale, se va afisa un mesaj corespunzator; daca nu sunt, se afiseaza pixelii diferiti si se calculeaza o 
+imagine diferenta, in care pixelii diferiti dintre cele doua imagini sunt marcati cu gri (a fost utila in
+procesul de debugging).
+
+
+b)fisiere sursa
+
+Am implementat varianta omp in 2 moduri pentru ca am gasit rapid doua moduri de rezolvare.
+
+-compare.c -> ia 2 poze si le compara
+-sequential_imp.c-> implementare secventiala, transforma fiecare pixel corespunzator minimului din fereastra 3x3
+din jurul sau. Prima linie, prima coloana, ultima linie, ultima coloana raman neschimbate, neputand fi aplicata 
+fereastra 3x3 in jurul acestora.
+-pthreads_imp.c -> implementare paralela, imparte matricea pe coloane in NO_THREADS parti, fiecare parte este editata
+de catre thread-ul respectiv, pentru ca dupa join imaginea rezultat sa fie cea editata
+-omp_imp.c -> implementare similara cu cea pthreads, doar ca am creat thread-uri cu omp_set_num_threads(), iar apoi am editat
+coloanele corespunzatoare id-ului
+-omp_imp2.c -> implementare in care am impartit matricea catre thread-uri in functie de inaltimea acesteia, folosind directiva 
+#pragma omp parallel for
+-mpi_imp.c -> in procesul MASTER am impartit matricea pe linii in NO_PROCESSES parti, fiecare parte este trimisa procesului responsabil,
+procesul editeaza partea sa de matrice, iar la final MASTER-ul strange toate rezultatele si le scrie in matricea finala
+-hybrid_imp.c -> impartirea la fel ca la mpi_imp.c, insa acum avem si NO_THREADS per proces care se "plimba" pe coloane. Practic, procesele primesc 
+parti de dimensiune height/NO_PROCESSES * width, iar apoi in fiecare proces, se creeaza thread-uri care editeaza parti disjuncte de dimensiune
+height*width/(NO_PROCESSES*NO_THREADS). Procesele impart matricea pe inaltime, thread-urile interne proceselor impart submatricile pe latime.
+
+
+2. ANALIZA A TIMPILOR ALGORITMILOR
+
+Pentru analiza timpilor de rulare am ales 2 poze: una alb-negru si alta color,
+insa de dimensiune mai mare: cea alb-negru are dimensiunea 3853 x 2000, iar cea color are
+dimensiunea 3840 x 2160.
+
+Checker-ul implementat de mine compara rezultatul fiecarei implementari, pentru numar de 
+thread-uri si procese in {1,2,4} cu rezultatul implementarii simple, secventiale.
+
+Rezultatele obtinute sunt corecte pentru toate comparatiile
+
+IMAGINE ALB-NEGRU
+-secvential 0.194 secunde
+-pthreads
+ => 1 thread (echivalent secvential) 0.202 secunde
+ => 2 threads 0.104 secunde
+ => 4 threads 0.065 secunde
+-openmp - v1
+ => 1 thread (echivalent secvential) 0.192 secunde
+ => 2 threads 0.103 secunde
+ => 4 threads 0.070 secunde
+-openmp - v2
+ => 1 thread (echivalent secvential) 0.203 secunde
+ => 2 threads 0.106 secunde
+ => 4 threads 0.061 secunde
+-mpi
+ => 1 proces (echivalent secvential) 0.183 secunde
+ => 2 procese 0.101 secunde
+ => 4 procese 0.066 secunde
+-hibrid
+ =>1 proces (echivalent cu pthreads cu 1, 2, 4 threads)
+    =>1 thread (echivalent secvential) 0.187 secunde
+    =>2 threads 0.106 secunde
+    =>4 threads 0.073 secunde
+=>2 procese
+    =>1 thread (echivalent mpi 2 procese) 0.105 secunde
+    =>2 threads 0.063 secunde
+    =>4 threads 1.332 secunde
+=>4 procese
+    =>1 thread (echivalent mpi 4 procese) 0.071 secunde
+    =>2 threads 0.151 secunde
+    =>4 threads 4.102 secunde
+
+
+IMAGINE COLOR
+-secvential 1.221 secunde
+-pthreads
+ => 1 thread (echivalent secvential) 0.997 secunde
+ => 2 threads 0.539 secunde
+ => 4 threads 0.367 secunde
+-openmp - v1
+ => 1 thread (echivalent secvential) 0.978 secunde
+ => 2 threads 0.522 secunde
+ => 4 threads 0.368 secunde
+-openmp - v2
+ => 1 thread (echivalent secvential) 1.142 secunde
+ => 2 threads 0.615 secunde
+ => 4 threads 0.450 secunde
+-mpi
+ => 1 proces (echivalent secvential) 0.833 secunde
+ => 2 procese 0.480 secunde
+ => 4 procese 0.296 secunde
+-hibrid
+ =>1 proces (echivalent cu pthreads cu 1, 2, 4 threads)
+    =>1 thread (echivalent secvential) 0.788 secunde
+    =>2 threads 0.445 secunde
+    =>4 threads 0.246 secunde
+=>2 procese
+    =>1 thread (echivalent mpi 2 procese) 0.421 secunde
+    =>2 threads 0.243 secunde
+    =>4 threads 2.121 secunde
+=>4 procese
+    =>1 thread (echivalent mpi 4 procese) 0.293 secunde
+    =>2 threads 0.734 secunde
+    =>4 threads 3.152 secunde
+
+Analizand rezultatele obtinute de programe pe cele 2 imagini, 
+deducem ca variantele pthreads, openmp v1, openmp v2, mpi au rezultate 
+bune si scaleaza, in timp ce varianta hibrid are probleme din cauza unei 
+paralelizari excesive, care cauzeaza overhead ce anuleaza performantele ipotetice
+ale acestei metode(fiecare proces va genera thread-uri care vor opera pe matrice).
+
+Avand in vedere rezultate similare ale implementarilor pthreads, omp1, omp2, mpi, 
+exista totusi diferente care ar putea inclina balanta in favoarea uneia dintre acestea.
+
+Pthreads, OMP, OMP2 impart matricea pe latime, deci ar fi performante pentru o imagine 
+de latime > inaltime, in timp ce mpi imparte matricea pe inaltime, deci ar fi performant
+pentru o imagine de inaltime > latime. In concluzie, trebuie comparate dimensiunile imaginilor
+si aleasa o implementare care sa ofere avantaje.
+

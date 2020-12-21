@@ -3,6 +3,7 @@
 #include <string.h>
 #include <omp.h>
 #include <math.h>
+#include <sys/time.h>
 
 int N;
 int P;
@@ -76,7 +77,7 @@ void edit_image(int id)
         if (N == 1)
         {
             offset_start = 3;
-            offset_end = -1;
+            offset_end = -3;
         }
         else
         {
@@ -86,7 +87,7 @@ void edit_image(int id)
             }
             if (id == N - 1)
             {
-                offset_end = -1;
+                offset_end = -3;
             }
         }
     }
@@ -115,43 +116,21 @@ void edit_image(int id)
     {
         for (i = 1; i < height - 1; ++i)
         {
-            for (j = 3 * start + offset_start; j < 3 * stop + offset_end; ++j)
+            for (j = 3 * start + offset_start; j < 3 * stop + offset_end; j += 3)
             {
-                min_val = 255;
-                //red channel
-                for (int a = -1; a <= 1; ++a)
+                for (int t = 0; t < 3; ++t)
                 {
-                    for (int b = -3; b <= 3; b += 3)
+                    unsigned char min_val = 255;
+                    for (int a = -1; a <= 1; ++a)
                     {
-                        if (img[(i + a) * 3 * width + j + b] < min_val)
-                            min_val = img[(i + a) * 3 * width + j + b];
+                        for (int b = -3; b <= 3; b += 3)
+                        {
+                            if (img[(i + a) * 3 * width + j + b + t] < min_val)
+                                min_val = img[(i + a) * 3 * width + j + b + t];
+                        }
                     }
+                    img_new[i * 3 * width + j + t] = min_val;
                 }
-                img_new[i * 3 * width + j] = min_val;
-                //green channel
-                j++;
-                min_val = 255;
-                for (int a = -1; a <= 1; ++a)
-                {
-                    for (int b = -3; b <= 3; b += 3)
-                    {
-                        if (img[(i + a) * 3 * width + j + b] < min_val)
-                            min_val = img[(i + a) * 3 * width + j + b];
-                    }
-                }
-                img_new[i * 3 * width + j] = min_val;
-                //blue channel
-                j++;
-                min_val = 255;
-                for (int a = -1; a <= 1; ++a)
-                {
-                    for (int b = -3; b <= 3; b += 3)
-                    {
-                        if (img[(i + a) * 3 * width + j + b] < min_val)
-                            min_val = img[(i + a) * 3 * width + j + b];
-                    }
-                }
-                img_new[i * 3 * width + j] = min_val;
             }
         }
     }
@@ -171,7 +150,10 @@ void write_image(char *name)
 
 int main(int argc, char const *argv[])
 {
-    if (argc != 4) {
+    struct timeval start_time, end_time;
+    double elapsed;
+    if (argc != 4)
+    {
         printf("Not enough arguments! Usage: ./openmp file_in_name file_out_name num_threads\n");
         return -1;
     }
@@ -184,12 +166,18 @@ int main(int argc, char const *argv[])
     {
         return -1;
     }
+    gettimeofday(&start_time, 0);
     omp_set_num_threads(N);
-    #pragma omp parallel
+#pragma omp parallel
     {
         int ID = omp_get_thread_num();
         edit_image(ID);
     }
+    gettimeofday(&end_time, 0);
+    long seconds = end_time.tv_sec - start_time.tv_sec;
+    long microseconds = end_time.tv_usec - start_time.tv_usec;
+    elapsed = seconds + microseconds * 1e-6;
+    printf("\nOMP took %f seconds with %d threads\n", elapsed, N);
     write_image(name_out);
     return 0;
 }

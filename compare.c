@@ -24,8 +24,6 @@ void compare_images(char *name_src, char *name_tgt)
 
     if (P_src != P_tgt)
     {
-        // printf("P's differ! IMAGES ARE DIFFERENT!\n");
-        // return;
         flag = 1;
     }
 
@@ -33,8 +31,6 @@ void compare_images(char *name_src, char *name_tgt)
     fscanf(tgt, "%d %d\n", &width_tgt, &height_tgt);
     if (width_src != width_tgt || height_src != height_tgt)
     {
-        // printf("Heights or widths differ! IMAGES ARE DIFFERENT!\n");
-        // return;
         flag = 1;
     }
 
@@ -42,59 +38,30 @@ void compare_images(char *name_src, char *name_tgt)
     fscanf(tgt, "%d\n", &maxval_tgt);
     if (maxval_src != maxval_tgt)
     {
-        // printf("Maxvals differ! IMAGES ARE DIFFERENT!\n");
-        // return;
         flag = 1;
     }
     free(aux);
-    int size;
-    if (P_src == 5)
-    {
-        size = width_src * height_src;
-    }
-    else if (P_src == 6)
-    {
-        size = width_src * height_src * 3;
-    }
     char val_src, val_tgt;
     fprintf(diff, "P%d\n", P_src);
     fprintf(diff, "%d %d\n", width_src, height_src);
     fprintf(diff, "%d\n", maxval_src);
-    //more exact comparison to check differences
     
-    // for (int i = 0; i < height_src; ++i)
-    // {
-    //     for (int j = 0; j < width_src * 3; ++j)
-    //     {
-    //         fscanf(src, "%c", &val_src);
-    //         fscanf(tgt, "%c", &val_tgt);
-    //         if (val_src != val_tgt)
-    //         {
-    //             printf("Pixels differ! IMAGES ARE DIFFERENT at %d %d! %d %d\n", i, j, val_src, val_tgt);
-    //             // return;
-    //             fprintf(diff, "%c", 100);
-    //             flag = 1;
-    //         }
-    //         else
-    //         {
-    //             fprintf(diff, "%c", val_src);
-    //         }
-    //     }
-    // }
-    for (int i = 0; i < size; ++i)
+    for (int i = 0; i < height_src; ++i)
     {
-        fscanf(src, "%c", &val_src);
-        fscanf(tgt, "%c", &val_tgt);
-        if (val_src != val_tgt)
+        for (int j = 0; j < width_src * 3; ++j)
         {
-            printf("Pixels differ! IMAGES ARE DIFFERENT at %d %d!\n", i/(width_src*3), size-width_src*3);
-            // return;
-            fprintf(diff, "%c", 100);
-            flag = 1;
-        }
-        else
-        {
-            fprintf(diff, "%c", val_src);
+            fscanf(src, "%c", &val_src);
+            fscanf(tgt, "%c", &val_tgt);
+            if (val_src != val_tgt)
+            {
+                printf("Pixels differ! IMAGES ARE DIFFERENT at %d %d! %d %d\n", i, j, val_src, val_tgt);
+                fprintf(diff, "%c", 100);
+                flag = 1;
+            }
+            else
+            {
+                fprintf(diff, "%c", val_src);
+            }
         }
     }
     if (flag == 0)

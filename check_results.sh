@@ -18,7 +18,7 @@ do
 	./openmp2 tests/macro.pnm macro_o2$i $i
 done
 
-for i in 1 2 4 8
+for i in 1 2 4
 do
 	mpirun -np $i ./mpi tests/darth-vader.pgm darth_mpi$i
 	mpirun -np $i ./mpi tests/macro.pnm macro_mpi$i
@@ -48,7 +48,7 @@ do
 	./compare macro_seq macro_o2$i
 done
 
-for i in 1 2 4 8
+for i in 1 2 4
 do
 	echo Comparing darth_seq with dart MPI with $i processes
 	./compare darth_seq darth_mpi$i
@@ -68,3 +68,4 @@ echo '===CLEANING==='
 make clean
 rm macro*
 rm darth*
+rm difference*
